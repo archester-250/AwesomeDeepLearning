@@ -88,7 +88,59 @@ H负定：局部最大值
 
 
 
-## Lecture 4:分批(batch)和动力？
+## Lecture 4:分批(batch)和动量方法
+
+### Batch
+
+shuffle（洗牌）：常见做法为每个迭代之间洗牌batch，使每次迭代的batch都不一样
+
+当每批的样本个数和总样本个数一样时，相当于没有分批。缺点为花费时间较长。
+
+batch size为1时，相当于每一个样本结束后都会更新一次参数。
+
+Batch size为1还是1000，所需时间相差无几。（原因：GPU并行运算）
+
+- 大的batch size一次迭代的时间会相对较少，但是验证集和训练集的准确率都会下滑。
+- 小的batch size可以减少鞍点所带来的“卡脖子”的情况，且对测试集的准确率会有提升。原因：局部最小值也有好坏之分。
+
+![image-20220711220145680](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\image-20220711220141107.png)
+
+平坦的是好的，尖锐的是坏的，如果测试集分布与训练集有一定差异，平坦的最小值不易对准确率造成太大的影响。
+
+- 大的batch size倾向于进入sharp，小的倾向于进入flat。
+
+### Momentum
+
+![image-20220711220904269](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\image-20220711220904269.png)
+
+在一般的梯度下降的基础上，根据前一个位移的情况再往前助推一步。
+$$
+m^0 = 0\\
+m^{i + 1} = \lambda m^i - \eta g^i\\
+\theta^{i+1} = \theta^i + m^{i+1}
+$$
+
+
+## Lecture 5:有适应性的学习率
+
+Fixed μ带来的问题：可能在前一阶段需要的特别低，后一阶段又需要高的学习率。
+
+定制化的学习率：
+$$
+\theta_i^{t+1}\leftarrow \theta_i^t-\frac{\eta}{\sigma_i^t}g_i^t\\
+$$
+σ的计算方式：
+
+- 平方根
+
+$$
+\sigma_i^t=\sqrt{\frac{1}{t+1}\displaystyle\sum_{j=0}^t(g_i^j)^2}
+$$
+
+这个方法在Adagrad中得到运用，实现了梯度较大时学习率较小，梯度较小时学习率较大的自适应。
+
+- RMS Prop：相比Adagrad加了一个α参数，删除了分母（to be continued...）
+
 
 
 
