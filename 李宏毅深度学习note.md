@@ -12,25 +12,25 @@ MSE:误差的平方和
 
 分段线性曲线：(hard sigmoid)
 
-![tmpEEAA](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmpEEAA.png)
+![tmpEEAA](.\images\tmpEEAA.png)
 
 可以用多个曲线来模拟任意一个函数
 
-![tmp9C04](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmp9C04.png)
+![tmp9C04](.\images\tmp9C04.png)
 
 可以用Sigmoid曲线来逼近
 
-![tmpE7E8](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmpE7E8.png)
+![tmpE7E8](.\images\tmpE7E8.png)
 
 batch:每次**更新**在不同的database batch上
 
-![tmp509B](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmp509B.png)
+![tmp509B](.\images\tmp509B.png)
 
 ### 迭代(Epoch)vs更新(update)
 
 换一次batch就是一次更新，遍历完一次database是一次迭代
 
-![tmpFDE](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmpFDE.png)
+![tmpFDE](.\images\tmpFDE.png)
 
 `Hard || Soft Sigmoid`,`ReLU`统称为激活函数。
 
@@ -52,7 +52,7 @@ batch:每次**更新**在不同的database batch上
   - 早停、正则化、丢弃
 - 但也不能限制太大（回到模型有偏差的原始问题）
 
-![tmpD070](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmpD070.png)
+![tmpD070](.\images\tmpD070.png)
 
 ### Mismatch
 
@@ -103,7 +103,7 @@ Batch size为1还是1000，所需时间相差无几。（原因：GPU并行运�
 - 大的batch size一次迭代的时间会相对较少，但是验证集和训练集的准确率都会下滑。
 - 小的batch size可以减少鞍点所带来的“卡脖子”的情况，且对测试集的准确率会有提升。原因：局部最小值也有好坏之分。
 
-![image-20220711220145680](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\image-20220711220141107.png)
+![image-20220711220145680](.\images\image-20220711220141107.png)
 
 平坦的是好的，尖锐的是坏的，如果测试集分布与训练集有一定差异，平坦的最小值不易对准确率造成太大的影响。
 
@@ -111,7 +111,7 @@ Batch size为1还是1000，所需时间相差无几。（原因：GPU并行运�
 
 ### Momentum
 
-![image-20220711220904269](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\image-20220711220904269.png)
+![image-20220711220904269](.\images\image-20220711220904269.png)
 
 在一般的梯度下降的基础上，根据前一个位移的情况再往前助推一步。
 $$
@@ -152,7 +152,7 @@ $$
 
 使用自适应性学习率有一个问题：在接近局部极小值的时候，因为平坦，小的梯度不断累积，使得可能会出现突然左右震荡的情况，不过这种情况在震荡后又会较小，如此反复。原因是震荡后的梯度又比较大，又会减缓每次走的距离。
 
-![tmpDBBF](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmpDBBF.png)
+![tmpDBBF](.\images\tmpDBBF.png)
 
 ### 解决方法：学习率的调度
 
@@ -161,7 +161,7 @@ $$
 - 学习率的“腐化”，让学习率随着每一次参数的更新越来越小。
 - “热身”：让η先变大后变小
 
-![tmpAB3B](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmpAB3B.png)
+![tmpAB3B](.\images\tmpAB3B.png)
 
 其速率也是需要超参数来调整。
 
@@ -184,7 +184,7 @@ $$
 
 在进行标准化的基础上与向量γ做内积后加上β
 
-![tmpAB83](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmpAB83.png)
+![tmpAB83](.\images\tmpAB83.png)
 
 作用：调整一下z帽的分布
 
@@ -204,7 +204,7 @@ p是超参数，pytorch中默认为0.1。
 
 ### 独热向量
 
-![tmp6A98](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmp6A98.png)
+![tmp6A98](.\images\tmp6A98.png)
 
 ### Softmax
 
@@ -242,17 +242,17 @@ $$
 
 张量变成向量的方法：拉直
 
-![tmpEDDA](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmpEDDA.png)
+![tmpEDDA](.\images\tmpEDDA.png)
 
 问题：如果全连接的话，假设有1000个神经元，就会产生3*10^7个参数，运算时间长且容易过拟合。
 
-![tmp5726](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmp5726.png)
+![tmp5726](.\images\tmp5726.png)
 
 #### 观察1
 
 选择一些有辨识度的特征进行训练
 
-![tmp9AF1](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmp9AF1.png)
+![tmp9AF1](.\images\tmp9AF1.png)
 
 不同的神经元负责辨认不同的部位
 
@@ -276,7 +276,7 @@ $$
 
 - Stride：从基点感受野移动的步长
 
-![tmp854B](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmp854B.png)
+![tmp854B](.\images\tmp854B.png)
 
 这是一个超参数，一般为1/2.如果移动到超出范围就要做一个填充(padding)，一般为补0。
 
@@ -284,7 +284,7 @@ $$
 
 同样的特征可能会出现在图片的不同区域。
 
-![tmpD98C](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmpD98C.png)
+![tmpD98C](.\images\tmpD98C.png)
 
 问题：不同的守备范围都需要有一个侦测鸟嘴的神经元，参数太多了。
 
@@ -294,17 +294,17 @@ $$
 
 - 参数完全相同
 
-![tmp2037](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmp2037.png)
+![tmp2037](.\images\tmp2037.png)
 
 ##### 经典的共享方式
 
 让每一个感受野都只有一组参数：Filter
 
-![tmpA8F7](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmpA8F7.png)
+![tmpA8F7](.\images\tmpA8F7.png)
 
 #### 总结：卷积层的好处
 
-![tmpC456](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmpC456.png)
+![tmpC456](.\images\tmpC456.png)
 
 全连接层+感受野+参数共享=卷积层
 
@@ -314,7 +314,7 @@ $$
 
 - 卷积层中有很多的过滤器(Filter)
 
-![tmp67AE](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmp67AE.png)
+![tmp67AE](.\images\tmp67AE.png)
 
 每一个过滤器的作用是识别图片中的一个特征。
 
@@ -322,11 +322,11 @@ $$
 
 将每个感受野中的矩阵与过滤器做卷积
 
-![tmpD38B](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmpD38B.png)
+![tmpD38B](.\images\tmpD38B.png)
 
 对每个过滤器都做一次卷积，得到特征映射图(Feature Map)
 
-![tmpA2A4](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmpA2A4.png)
+![tmpA2A4](.\images\tmpA2A4.png)
 
 这是第一层经过卷积层后得到的特征，前一层有多少个filter后一层的高度就是多少，这里假设第一层有64个filter，第二层高度就是64.
 
@@ -334,7 +334,7 @@ $$
 
 ### 两种看卷积层方式的总结
 
-![tmp31B5](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmp31B5.png)
+![tmp31B5](.\images\tmp31B5.png)
 
 - 神经元视角：仅需观察图片的一小部分，每一个小部分都检测一个小范围，对于全局出现的相同filter以共享参数的方式呈现
 - filter视角：每个filter都可以覆盖图片的每个角落，在进行卷积运算之后可以映射成feature map，其中一个数值重叠起来就是处理前的一个感受野。
@@ -347,9 +347,9 @@ $$
 
 Example:最大池化：分组，然后选择组中最大的一个
 
-<img src="E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmp2859.png" alt="tmp2859" style="zoom:50%;" />
+<img src=".\images\tmp2859.png" alt="tmp2859" style="zoom:50%;" />
 
-<img src="E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmp60EE.png" alt="tmp60EE" style="zoom:50%;" />
+<img src=".\images\tmp60EE.png" alt="tmp60EE" style="zoom:50%;" />
 
 ### 卷积层+池化
 
@@ -358,7 +358,7 @@ Example:最大池化：分组，然后选择组中最大的一个
 
 ### CNN总结
 
-![tmpE164](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmpE164.png)
+![tmpE164](.\images\tmpE164.png)
 
 Flatten：把矩阵的变量拉直为向量，然后丢进全连接层，最后加一个softmax得到图像识别的结果。
 
@@ -381,7 +381,7 @@ Flatten：把矩阵的变量拉直为向量，然后丢进全连接层，最后�
 
 交叉熵(Cross Entropy)：
 
-![img](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\v2-ad4588debf5c0d869f3589edd0425e6c_1440w.jpg)
+![img](.\images\v2-ad4588debf5c0d869f3589edd0425e6c_1440w.jpg)
 
 -H(p, q)越小越好
 
@@ -402,7 +402,7 @@ $$
 
 无穷范式更接近人类的感知能力，只选取变化最大的作为距离。
 
-![tmp1494](E:\桌面\其他文件\DL\AwesomeDeepLearning\images\tmp1494.png)
+![tmp1494](.\images\tmp1494.png)
 
 2022.7.10：开错ppt了...
 
