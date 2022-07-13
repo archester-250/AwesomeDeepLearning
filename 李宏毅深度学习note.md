@@ -364,6 +364,314 @@ Flatten：把矩阵的变量拉直为向量，然后丢进全连接层，最后�
 
 
 
+## Lecture 9:自注意力
+
+### 向量集合作为输入
+
+#### 文字处理
+
+句子里面的每一个词汇都描述成一个向量，将词汇表示成向量
+
+- 最简单的做法：独热编码
+
+问题：它假设所有词汇之间都是没有关系的
+
+- 词嵌入(Word Embedding)
+
+#### 声音信号
+
+将一段声音信号取一个范围--Window
+
+将Window里面的资讯描述成向量--Frame
+
+#### 图
+
+可以将每一个节点看作一个向量
+
+#### 分子信息
+
+- 一个分子可以看成一个图
+- 每一个原子表述为一个向量
+- 一个原子可以用独热编码来表示
+
+### 输入所对应的输出
+
+- 每一个向量有一个对应的标签(Sequence Labeling)
+
+![tmp491](images/tmp491.png)
+
+- 一整个序列只输出一个标签
+
+![tmp1B6C](images/tmp1B6C.png)
+
+- 由机器决定输出标签的个数（sequence to sequence）
+
+### Sequence Labeling
+
+朴素的想法：用一个全连接层
+
+![tmp40E](images/tmp40E.png)
+
+缺陷：I saw a saw中，后面的saw和前面的saw无区别
+
+解决方案1：将前后的词向量串起来（成为window）再放到全连接网络
+
+![tmpBA36](images/tmpBA36.png)
+
+缺陷：无法覆盖整个序列长度（序列有长有短，但window不能自由伸缩）
+
+终极解决方案：Self-Attention
+
+### Self-Attention
+
+- Self-Attention会注意一整个序列的资讯
+
+![tmpC0AC](images/tmpC0AC.png)
+
+- Self-Attention可以叠加多层，可将全连接层与自注意力交替使用
+
+#### 过程
+
+![tmp45C8](images/tmp45C8.png)
+
+以b<sup>1</sup>的产生为例。向量与a<sup>1</sup>的关联程度用α表示。
+
+α的产生：
+
+- 将两个向量与矩阵W<sup> q</sup>和W<sup> k</sup>相乘
+- 所得结果可以做点积，也可以相加后求正切值
+
+![tmpF42D](images/tmpF42D.png)
+
+下面的求解过程默认使用点积法，产生的α成为注意力分数
+
+![tmpF6D9](images/tmpF6D9.png)
+
+q<sup>1</sup>相当于要搜索的关键字，k<sup>2</sup>相当于被搜索的关键词，点积之后就能得到注意力的分数。α<sub>1,3</sub>等同理。理论上也可以和自己算关联性。
+
+随后放入一个Soft-Max
+
+![tmpBF5B](images/tmpBF5B.png)
+
+也可以用别的激活函数，比如ReLU等。
+
+将初始的a<sup>i</sup>都乘上W<sup>v</sup>得到新向量v<sup>i</sup>
+
+将其与处理过的α‘<sub>1,i</sub>相乘，得到一个数，将其相加可得b<sup>1</sup>
+
+![tmpB767](images/tmpB767.png)
+
+如果a<sup>1</sup>和a<sup>2</sup>的关联性较大，那么α‘<sub>1,2</sub>就会较大，最后的b<sup>1</sup>也会更接近a<sup>2</sup>。
+
+### 矩阵角度
+
+将向量合并起来成为矩阵
+
+![tmpDD24](images/tmpDD24.png)
+
+k<sup>i</sup>与q<sup>1</sup>做的内积可以转换为K<SUP>T</SUP>和q<sup>1</sup>的乘积
+
+以此类推：
+
+![tmpD89](images/tmpD89.png)
+
+![tmp5425](images/tmp5425.png)
+
+### Self-Attention总结
+
+$$
+Q=W^qI\\
+K=W^kI\\
+V=W^vI\\
+A'\leftarrow A=K^TQ\\
+O=VA'
+$$
+
+I为输入矩阵，由a<sup>i</sup>拼接而成，O为输出矩阵，由b<sup>i</sup>拼接而成。
+
+需要学习的参数：W<sup>q</sup>W<sup>k</sup>W<sup>v</sup>
+
+### Multi-head Self-Attention
+
+![tmpAD12](images/tmpAD12.png)
+
+这里使用了两个头：采用两个不同的矩阵，将q<sup>i</sup>转化为q<sup>i,1</sup>和q<sup>i,2</sup>.剩下的也都需要两个矩阵来变换。
+
+意义：问题中有多种不同相关性的时候可以增加head来表示。
+
+后续计算时在相同的head中进行变换，方法与上文相同。
+
+![tmp7989](images/tmp7989.png)
+
+最后将得到的两个head进行变换，矩阵为W<sup>O</sup>,最后得到变换后的向量b<sup>i</sup>，作为输入进入下一层。
+
+![tmp886](images/tmp886.png)
+
+### 位置编码(positional encoding)
+
+- 目前的self-attention没有任何的位置信息
+- 位置信息在句子分析中还是有一定重要性的，比如动词不容易处在句首
+
+方法：为每个位置设定一个位置向量，用e<sup>i</sup>表示，i代表位置，不同位置有不同的向量。
+
+![tmpDA93](images/tmpDA93.png)
+
+将其加在a<sup>i</sup>上即可。
+
+#### 手动创造 or 从数据集中学习
+
+以上的位置向量是手动创造的，只适用于固定的序列长度。位置向量也可以通过一个固定的规则或者学习资料产生。
+
+### 应用
+
+- BERT：自然语言处理领域
+- 语音处理：Truncated(截断的) Self-Attention,只取一小段范围进行处理，范围多大由人为设定。
+- 图片
+- CNN可以看作是一种简化版的Self-Attention
+  - 因为CNN只考虑了感受野内的资讯，而Self-Attention考虑了整张图片的资讯。
+  - CNN中感受野的范围是人划定的，Self-Attention中感受野的范围是自己学出来的
+  - Self-Attention相比于CNN弹性较大，但也需要更多的训练资料来达到比CNN更好的训练效果。
+
+![tmp757C](images/tmp757C.png)
+
+#### Self-Attention vs. RNN
+
+RNN(循环神经网络)很大一部分可以被self-attention取代。
+
+![tmp667D](images/tmp667D.png)
+
+RNN只考虑了已经输入的向量的处理，没有考虑完整的序列
+
+- 但RNN也可以双向进行
+
+还有一个区别是如果蓝色与黄色关系较大，使用RNN带来的信息衰减较强，因为间隔层数较多，但是self-attention就没有这个问题。
+
+并且RNN没法并行处理，但self-attention可以。
+
+
+
+- 图（另起专题学习）
+
+self-attention缺点：运算量大
+
+
+
+## Lecture 10:Transformer
+
+### Seq2seq
+
+- 不知道输出多长时使用
+- 可用于语音识别、机器翻译、语音翻译等
+- 聊天机器人
+- 智能问答
+
+### 文法剖析
+
+输入及输出：
+
+![tmp4F9](images/tmp4F9.png)
+
+### 多标签分类任务(multi-label classification)
+
+#### multi-label vs.multi-class
+
+前者的输出只能为一个分类，后者的输出可以为一个或多个分类。
+
+![tmp5356](images/tmp5356.png)
+
+### 物品检测
+
+### 编码-解码
+
+seq2seq model分为编码和解码两个部分，其为应用层的概念
+
+transformer和encoder-decoder都是网络架构层面的概念
+
+传统的Encoder-Decoder会使用rnn、lstm、gru来进行构建，而transformer则是放弃了使用常见的RNN结构，使用了一种新的方式。
+
+![tmp2C58](images/tmp2C58.png)
+
+### 编码器(Encoder)
+
+作用：给一排向量，输出另外一排向量。
+
+- self-attention:heavy_check_mark:
+- RNN
+- CNN
+
+一个编码器中包含若干块(block)，每一个block基本包括一个self-attention和一个全连接层。
+
+![tmp3B92](images/tmp3B92.png)
+
+在transformer中，在输出**b**之外，还需要加上输入**a**得到新的输出。
+
+![tmpA51D](images/tmpA51D.png)
+
+这样的网络架构叫做残差链接(residual connection)。得到结果之后做一次标准化，这里是层标准化(layer normalization)。
+
+![tmp666C](images/tmp666C.png)
+
+相比起batch标准化，层标准化不需要乘上矩阵并加上偏置。
+
+在FC(全连接)处，也会有residual架构，同样将输出和输入加起来形成新的输出。
+
+### 编码器总结
+
+![tmp8017](images/tmp8017.png)
+
+- 在self-attention的输入处加上位置向量
+- multi-head attention
+- residual+layer normalization
+- feed forward：全连接层FC
+- 再做一次residual+normalization
+
+以上为一个block的内容，这一个block会重复若干次。
+
+### 解码器-自回归的(Autoregressive/AT)
+
+#### 产生一段文字的过程
+
+给一个特殊的符号Begin of Sentence(BOS)
+
+- 特殊令牌，代表开始
+- 也用独热编码表示
+
+decoder生成的向量长度和词汇表的大小相同
+
+第一次的输入只有开始字符
+
+在生成最后的向量之前通常会跑一个softmax使其总和为1
+
+分数最高的文字即为输出，这时输出第一个文字块
+
+![tmpC5C8](images/tmpC5C8.png)
+
+然后将第一个字体块一并作为新的输入
+
+![tmp52BF](images/tmp52BF.png)
+
+不断循环，得到最终结果。
+
+#### Masked Multi-Head Attention
+
+b<sup>i</sup>只能够通过上角标不超过i的a的资讯生成，即q<sup>i</sup>只可以和上角标不超过i的k计算Attention score
+
+![tmp399A](images/tmp399A.png)
+
+原因：输出的东西是一个个产生的，所以只能考虑左边的输入，没办法考虑右边的东西。
+
+目前存在的问题：decoder必须自己决定输出的长度
+
+解决方法：再准备一个特殊符号作为结束符号
+
+### 解码器-非自回归的(Non-autoregressive/NAT)
+
+
+
+
+
+
+
 
 
 
