@@ -666,12 +666,230 @@ b<sup>i</sup>只能够通过上角标不超过i的a的资讯生成，即q<sup>i<
 
 ### 解码器-非自回归的(Non-autoregressive/NAT)
 
+特点：一次性产生整个句子
+
+![tmp80F8](images/tmp80F8.png)
+
+问题：如何知道开始字符放多少个当作NAT Decoder的收入？
+
+- 另外训练一个分类器，输入为解码器的输入，输出为解码器应该输出的长度
+- 给输入器若干开始字符的令牌，个数为输出句子的上限，输出在结束字符处停止，后面的字符忽略不计。
+
+NAT的好处
+
+- 并行化
+- 可以控制输出长度
+
+模型：Tacotron、FastSpeech
+
+### Encoder-Decoder
+
+![tmpE687](images/tmpE687.png)
+
+#### 过程：
+
+- 将decoder的输入向量进行masked self-atteniton后得到的向量乘上一个矩阵变换后得到向量q
+
+- 通过encoder的a<sup>i</sup>输出乘上W<sup>k</sup>，生成k<sup>i</sup>,和q相乘的到attention score：α
+- 输出的a<sup>i</sup>乘上W<sup>v</sup>得到向量v<sup>i</sup>，将其乘上α得到v
+- 将v送入全连接层
+
+![tmpDBBD](images/tmpDBBD.png)
+
+#### 总结
+
+query来自decoder，k和v来自encoder
+
+### 训练过程
+
+- 目标：minimize cross entropy
+
+![tmp1E50](images/tmp1E50.png)
+
+![tmp868C](images/tmp868C.png)
+
+该过程叫做Teacher Forcing
+
+问题：训练的时候解码器可以看到正确答案，但测试时没有正确答案，存在不匹配的问题。
+
+### 小贴士
+
+#### 机械复制
+
+有些输入不需要进行分析，仅需要复制成为输出，比如人名
+
+![tmp9024](images/tmp9024.png)
+
+在形成摘要/总结时，也需要复制的能力。
+
+模型：Pointer Network,Copy Mechanism
+
+#### Guided Attention
+
+- 语音合成可能会出现奇奇怪怪的错误
+
+要做的事情：强迫Attention有一个固定的羊毛，要求学到的Attention从左向右。
+
+- Mnotonic Attention,Location-Aware Attention
+
+#### Beam Search(束搜索)
+
+在每一个时间步进中在产生的所有字中选择一个
+
+![tmp3892](images/tmp3892.png)
+
+- 贪婪解码会选择当下最好的路径，但可能会错过一些更好的选择--束搜索
+
+![tmp5EB4](images/tmp5EB4.png)
+
+- 在单一答案的学习中表现更好，如语音识别等
+- 需要一些创造力的时候表现更差，如文章续写
+
+![tmpE101](images/tmpE101.png)
+
+#### 训练集和测试集不一致--Exposure Bias
+
+![tmpD29](images/tmpD29.png)
+
+解决方法简单粗暴：给Decoder加一些错误的东西--Scheduled Sampling
 
 
 
+## Lecture 11:GAN(生成对抗网络)
+
+- 特点：会加上一个随机变量Z，其服从一个简单的分布
+
+![tmp38EE](images/tmp38EE.png)
 
 
 
+融合的方法：直接拼接起来或者相加
+
+- 最后输出的向量服从一个复杂的分布
+
+### 为什么需要一个分布？
+
+如果在原始预测中出现了有两个趋势的可能相等的情况，机器会选择两个都走，但是对于一些图片规则是不允许的，需要有一个分布来随机决定机器需要走哪个趋势。
+
+- 创造力
+
+### Anime Face Generation
+
+- 自动生成动漫人物的脸
+- 无条件生成，不需要X
+
+![tmp264B](images/tmp264B.png)
+
+generator会想办法将简单的分布对应到一个复杂分布
+
+#### Discriminator
+
+- 输入一张图片，输出一个数值(评分)
+- 数值越大越像真实的动漫人物图像
+
+![tmp7DCF](images/tmp7DCF.png)
+
+### GAN的基本想法
+
+![tmpBF4B](images/tmpBF4B.png)
+
+
+
+初始参数为随机选择，discriminator学习目标为分辨generator输出与真正图片的不同，让generator调整自己的参数
+
+### 算法
+
+- 将generator和discriminator初始化
+
+#### 第一步：固定generator，更新discriminator
+
+- 只训练discriminator
+  - 真正的头像都标1，生成的都标0
+  - 训练一个分类器/回归问题
+
+![tmpF48A](images/tmpF48A.png)
+
+#### 第二步：固定D，更新G
+
+让generator尽量提高在discriminator中的分数
+
+![tmpFB17](images/tmpFB17.png)
+
+- 重复上述两步
+
+### GAN背后的理论支撑
+
+PG：generator生成的比较复杂的分布
+
+Pdata：数据集生成的分布
+$$
+G^*=arg\min_GDiv(P_G,P_{data})
+$$
+div:两个分布间的divergence(散度)，可用KL散度，JS散度等衡量
+
+值越小，说明分布越像
+
+- GAN可以突破不知道如何算散度的限制
+
+做法：
+
+- 在PG和Pdata的两个分布中抽样
+- 将其用于训练，训练目标为看到真实数据集给出高分，看到生成数据集给低分。
+- 这是一个优化问题
+
+$$
+Training:D^*=arg\max_DV(D,G)\\
+$$
+
+Objective Function for D:
+$$
+V(G,D)=E_{y \sim P_{data}}[logD(y)]+E_{y \sim P_G}[log(1-D(y))]
+$$
+
+- 左半部分表示y是从Pdata中采样出来的，扔到D后再取对数
+- 右半部分表示y是从PG中采样出来的，扔到D后被1减再取对数
+- 希望左半部分的D(y)足够大，右半部分的D(y)足够小
+
+实际上D*的值和JS散度有关。因此不需要算散度，只需要训练Discriminator之后看一下Objective Function有多大就可以。
+
+
+
+直观理解：
+
+- 假设PG和Pdata的散度很小，则说明差距不大，是混在一起的，难以分开，objective function的值就不会很大
+
+![tmp7911](images/tmp7911.png)
+
+### 总结
+
+![tmp3223](images/tmp3223.png)
+
+所以G*可以替换为：
+$$
+G^*=arg\min_G\max_DV(G,D)
+$$
+discriminator：想要区分出来
+
+generator：想要和数据集接近一些
+
+- 构成了对抗关系
+
+![tmp9460](images/tmp9460.png)
+
+### Tips for GAN
+
+#### WGAN
+
+##### JS divergence不合适
+
+- PG和Pdata的重叠部分往往非常少
+  - 可以比作二维空间当中的两条直线，相交的范围几乎可以忽略
+  - 不可知PG和Pdata的全貌，只知道样本的分布，如果取样的点不够多不够密，即使实际上有重叠，对于discriminator来说也是没有重叠的。
+- JS散度的特性：两个分布只要没有重叠算出来的结果一定是log2
+
+![tmp8E7D](images/tmp8E7D.png)
+
+后果：每次训练完分类器后的discriminator正确率都是100%。
 
 
 
