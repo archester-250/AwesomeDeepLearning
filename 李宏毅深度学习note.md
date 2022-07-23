@@ -758,6 +758,7 @@ query来自decoder，k和v来自encoder
 ## Lecture 11:GAN(生成对抗网络)
 
 - 特点：会加上一个随机变量Z，其服从一个简单的分布
+- 无监督模型
 
 ![tmp38EE](images/tmp38EE.png)
 
@@ -890,6 +891,86 @@ generator：想要和数据集接近一些
 ![tmp8E7D](images/tmp8E7D.png)
 
 后果：每次训练完分类器后的discriminator正确率都是100%。
+
+##### Wasserstein Distance
+
+含义为从一个分布到另一个分布所移动距离要最小
+
+公式：
+$$
+\max_{D\in1-Lipschitz}\{E_{y\sim P_{data}}[D(y)]-E_{y\sim P_G}[D(y)]\}
+$$
+Pdata采样出来的：越大越好
+
+PG采样出来的：越小越好
+
+D属于1-Lipschitz的含义：D必须足够光滑
+
+如果不光滑：discriminator会给真实图像无限大的正值，给生成图像无限大的负值
+
+1-Lipschitz Function的其中一个想法：Gradient Penalty
+
+
+
+### GAN目前存在的问题
+
+如果generator和discriminator中有一者发生了问题，那两个训练器效果都会变差
+
+
+
+### GAN for Sequence Generation
+
+Decoder:Generator
+
+Token:将一个序列、字段分成一小段的单位，这里一个字就是一个token
+
+![tmpEDDF](images/tmpEDDF.png)
+
+问题：当generator产生参数的微量变化时，输出的汉字一般不会改变，导致discriminator的分数不变，因此generator没办法用梯度下降法。
+
+
+
+### Generation的评价
+
+- 可以将GAN产生的图片作为一个图片分类系统的输入，看看会产生怎样的结果，其输出为在给定y下每一类的分布P(c|y)
+
+### 多样性问题-Mode Collapse
+
+![tmpEE3F](images/tmpEE3F.png)
+
+可能会出现generator生成的图片来来去去差不多一张脸的情况。
+
+当前的解决方法：在出现Mode Collapse之前停止训练
+
+### 多样性问题-Mode Dropping
+
+产生出来的资料只有真实资料的一部分
+
+![tmp8263](images/tmp8263.png)
+
+### 检测多样性的方法
+
+将生成图片进行图片分类，然后生成这些图片的分布，如果分布非常集中，就说明多样性缺失。
+
+![tmpD39E](images/tmpD39E.png)
+
+:star:Quality vs Diversity
+
+- Quality只看一张图片，看它放入分类器的时候，输出的分布是否集中。
+- Diversity是看一组图片，对一组图片进行图片分类，输出的越平均说明多样性越强。
+
+### 评价指标
+
+Inception score:使用Inception Network测量
+
+Fréchet Inception Distance (FID)
+
+- 将图片放到Inception Net
+- 选取进入Softmax之前的隐藏层的输出，使用其代表这张图片
+
+![tmpD40A](images/tmpD40A.png)
+
+## FID越小，代表两组图片越接近。
 
 
 
